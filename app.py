@@ -1,9 +1,12 @@
 from asyncio.windows_events import NULL
 import csv
-import struct
-import json
+import random
 from flask import render_template, request
 from pymem import Pymem
+
+#Add lock to clearing memory. This is essentially an API key, but far less secure.
+apiKey = ''.join(random.choice('0123456789ABCDEF') for i in range(16))
+print(apiKey)
 
 pm = Pymem('pcsx2.exe')
 
@@ -78,6 +81,12 @@ def getAbilities():
 # People like to assume that a server has to have some webpage- we provide one, and an elementary interface for manually interacting with the api.
 # This isn't reccomended.
 app = Flask(__name__)
+@app.before_request
+def before_request():
+    if request.args.get('apiKey') != apiKey:
+        return "Missing or Incorrect API KEY", 401
+
+
 @app.route('/')
 def generate():
     return render_template('home.html')
