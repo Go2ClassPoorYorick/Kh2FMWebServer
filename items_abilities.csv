@@ -201,8 +201,8 @@ PS2 Address,PC Address,Anchor,ID,Name,Type
 1CDCE2C,2A6B8DC,Sys3+11B2C,00DF,Synch Blade,Ability
 1CDCE44,2A6B8F4,Sys3+11B44,00DC,Wisdom Shot,Ability
 1CDCE5C,2A6B90C,Sys3+11B5C,00DD,Mobile Action,Ability
-1CDCE74,2A6B924,Sys3+11B74,0,Magic Haste,Ability
-1CDCE8C,2A6B93C,Sys3+11B8C,0,Magic Spice,Ability
+1CDCE74,2A6B924,Sys3+11B74,00E0,Magic Haste,Ability
+1CDCE8C,2A6B93C,Sys3+11B8C,00E1,Magic Spice,Ability
 1CDCEA4,2A6B954,Sys3+11BA4,101,Master Strike,Ability
 1CDCEBC,2A6B96C,Sys3+11BBC,102,Disaster,Ability
 1CDCED4,2A6B984,Sys3+11BD4,105,Master Magic,Ability

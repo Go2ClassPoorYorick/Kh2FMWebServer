@@ -45,8 +45,9 @@ def getAbilities():
             if line_count == 0:
                 line_count += 1
             else:
-                shittyWayToMapItems[row["ID"].zfill(4)]={"name":row["Name"],"Type":row["Type"], "Id":row["ID"]}
-                line_count += 1
+                if row["Type"] == "Ability":
+                    shittyWayToMapItems[row["ID"].zfill(4)]={"name":row["Name"],"Type":row["Type"], "Id":row["ID"].zfill(4)}
+                    line_count += 1
     #    print(f'Processed {line_count} lines.')
     #print(shittyWayToMapItems)
 
