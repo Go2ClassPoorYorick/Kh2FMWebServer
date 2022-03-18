@@ -1,7 +1,8 @@
 from asyncio.windows_events import NULL
 import csv
 import struct
-from flask import request
+import json
+from flask import render_template, request
 from pymem import Pymem
 
 pm = Pymem('pcsx2.exe')
@@ -30,26 +31,24 @@ tiered_abilities_chart = {
     "006D" : "Glide"
 }
 
+shittyWayToMapItems = {}
+with open('items_abilities.csv', mode='r') as csv_file:
+    csv_reader = csv.DictReader(csv_file)
+    line_count = 0
+    for row in csv_reader:
+        if line_count == 0:
+            line_count += 1
+        else:
+            if row["Type"] == "Ability":
+                shittyWayToMapItems[row["ID"].zfill(4)]={"name":row["Name"],"Type":row["Type"], "Id":row["ID"].zfill(4)}
+                line_count += 1
+#    print(f'Processed {line_count} lines.')
+#print(shittyWayToMapItems)
+
 from flask import Flask
 
 def getAbilities():
     abilities_bytes = pm.read_bytes(abilities_start,abilities_length)
-
-
-
-    shittyWayToMapItems = {}
-    with open('items_abilities.csv', mode='r') as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        line_count = 0
-        for row in csv_reader:
-            if line_count == 0:
-                line_count += 1
-            else:
-                if row["Type"] == "Ability":
-                    shittyWayToMapItems[row["ID"].zfill(4)]={"name":row["Name"],"Type":row["Type"], "Id":row["ID"].zfill(4)}
-                    line_count += 1
-    #    print(f'Processed {line_count} lines.')
-    #print(shittyWayToMapItems)
 
     i=0
     equipped_abilities = []
@@ -66,28 +65,38 @@ def getAbilities():
                 equipped_abilities.append(shittyWayToMapItems[ability_str.upper()])
         except(KeyError):
             continue
-    return str(equipped_abilities)
+    return equipped_abilities
 
 
 app = Flask(__name__)
+@app.route('/')
+def generate():
+    return render_template('home.html')
 
-@app.route("/readmem")
+@app.route('/readmem')
 def read():
-    return getAbilities()
+    return str(getAbilities())
 
 
-@app.route("/writeAbility", methods = ['POST','GET'])
+@app.route('/writeAbility', methods = ['POST','GET'])
 def writeAbilities():
     oldAbilityList = getAbilities()
     abilities_to_write = request.args.getlist('ability')
+    byteChart = []
+    print(len(oldAbilityList))
+    offset = 0x2032E074 + len(oldAbilityList)*2
+    print(offset)
     for ability in abilities_to_write:
         if tiered_abilities_chart.get(str(ability)) == None:
             # TODO: Work out mapping addresses to store these abilities
             print(ability)
+            pm.write_bytes(offset,bytes.fromhex(ability.zfill(4))[::-1],2) #[::-1] reverses byte order, allowing me to use traditionally written item ids to write to memory
+            offset += 2 
         else:
+            print(f'ability:{ability} skipped due to lackof "scaled ability" logic')
             # TODO: count existing instances of each type of tiered ability, and sum them.
-            continue
-    return oldAbilityList
+                
+    return str(getAbilities())
     
 
 if __name__ == '__main__':
