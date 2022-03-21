@@ -1,10 +1,12 @@
 from asyncio.windows_events import NULL
 import csv
 import random
+import os
 from flask import render_template, request
 from pymem import Pymem
 
 #Add lock to clearing memory. This is essentially an API key, but far less secure.
+
 apiKey = ''.join(random.choice('0123456789ABCDEF') for i in range(16))
 print(apiKey)
 
@@ -65,26 +67,23 @@ def getAbilities():
     i=0
     while i < len(abilities_bytes):
         ability = abilities_bytes[i:i+2][::-1]
-        equipped = b'\x80\x00' #This is the "equipped" bitmask.
-        ability_str = str(ability.hex())
+        ability_str = hex(int.from_bytes(ability,"big") & int.from_bytes(b'\x7F\xFF',"big"))[2:].zfill(4) # Remove equipped bit flag
+
         i=i+2
-        try:#When an ability is larger than 0x8000 it must be equipped- we just want the ability flag, so lets remove the equipped mask
-            if int.from_bytes(ability, "big") > int.from_bytes(equipped, "big"): 
-                ability = int.from_bytes(ability, "big") - int.from_bytes(equipped, "big")
-                equipped_abilities.append(shittyWayToMapAbilities[str(ability.to_bytes(2, 'big').hex()).upper()])
-            else: #These abilities are unequipped or invalid
-                equipped_abilities.append(shittyWayToMapAbilities[ability_str.upper()])
+        try:
+            equipped_abilities.append(shittyWayToMapAbilities[ability_str.upper()])
         except(KeyError):
             continue
     return equipped_abilities
 
 # People like to assume that a server has to have some webpage- we provide one, and an elementary interface for manually interacting with the api.
-# This isn't reccomended.
+# This isn't reccomended.(especially because it isn't finished)
 app = Flask(__name__)
 @app.before_request
 def before_request():
-    if request.args.get('apiKey') != apiKey:
-        return "Missing or Incorrect API KEY", 401
+    if os.environ.get('debug') != "true":
+        if request.args.get('apiKey') != apiKey:
+            return "Missing or Incorrect API KEY", 401
 
 
 @app.route('/')
