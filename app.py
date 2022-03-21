@@ -99,7 +99,7 @@ def read():
     return str(getAbilities()).replace('], [','],<br>[')
 
 # This cluster allows us to write abilities... see readme
-@app.route('/writeAbility', methods = ['POST','GET'])
+@app.route('/writeAbilities', methods = ['POST','GET'])
 def writeAbilities():
     oldAbilityList = getAbilities()
     abilities_to_write = request.args.getlist('ability')
@@ -123,7 +123,7 @@ def writeAbilities():
             print("Couldn't write any new abilities, ability list full")
     return str(getAbilities()).replace('}, {','<br>')
 
-@app.route('/clearAbility', methods = ['POST','GET'])
+@app.route('/clearAbilities', methods = ['POST','GET'])
 def clearAbilities():
     pm.write_bytes(
     abilities_start, # Clear from the start of the memory range
