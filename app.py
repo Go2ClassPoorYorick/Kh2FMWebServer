@@ -38,7 +38,16 @@ tiered_abilities_chart = {
     "006A" : "Glide",
     "006B" : "Glide",
     "006C" : "Glide",
-    "006D" : "Glide"
+    "006D" : "Glide",
+}
+
+# Used with the above table to assist in locating possible IDs for leveled abilities
+tiered_abilities_list = {
+"High Jump" : [0x005E, 0x005F, 0x0060, 0x0061],
+"Quick Run" : [0x0062, 0x0063, 0x0064, 0x0065],
+"Dodge Roll": [0x0234, 0x0235, 0x0236, 0x0237],
+"Aerial Dodge": [0x0066, 0x0067, 0x0068, 0x0069],
+"Glide" : [0x006A, 0x006B, 0x006C, 0x006D]
 }
 
 # This function reads item_abilities.csv into a json-like-object to provide an interface for viewing ability names and ids. 
@@ -74,7 +83,7 @@ def getAbilities():
             if int.from_bytes(ability,"big") != 0:
                 equipped_abilities.append([memLocation, shittyWayToMapAbilities[ability_str.upper()]])
             else:
-                equipped_abilities.append([memLocation, {}])
+                equipped_abilities.append([memLocation, {"Id":'0000'}])
         except(KeyError):
             equipped_abilities.append([memLocation, {"Id":hex(int.from_bytes(ability,"big"))}])
     return equipped_abilities
@@ -103,7 +112,7 @@ def read():
 def writeAbilities():
     oldAbilityList = getAbilities()
     abilities_to_write = request.args.getlist('ability')
-    emptyMemItr = (location for location in oldAbilityList if location[1] == {}) #Allows us to use the next(emptyMemItr) function to access memory locations for writing
+    emptyMemItr = (location for location in oldAbilityList if location[1] == {"Id":'0000'}) #Allows us to use the next(emptyMemItr) function to access memory locations for writing
 
     for ability in abilities_to_write:
         try:
@@ -115,10 +124,26 @@ def writeAbilities():
                     bytes.fromhex(ability.zfill(4))[::-1], # [::-1] reverses byte order, allowing me to use traditionally written item ids to write to memory
                     2 # Bytes to write (this is silly, why wouldn't pymem just calculate that from above???)
                     ) 
-            else:
-                print(f'ability: {ability} skipped due to lack of "scaled ability" logic')
-                # TODO: count existing instances of each type of tiered ability, and sum them.   
-                #character_count_address = pymem.pattern.scan_pattern_page(pm.process_handle, address_reference, bytes_pattern)
+            else: # life is a nightmare, help
+                try: 
+                    abilityTierName = tiered_abilities_chart.get(str(ability)) # Identity which tiered ability we're looking for
+                    curAbility = next(currentAbilities for currentAbilities in oldAbilityList if int(currentAbilities[1]["Id"],16) in tiered_abilities_list[abilityTierName]) #get only the first occurence
+                    if int(curAbility[1]["Id"],16) < max(tiered_abilities_list[abilityTierName]):
+                        pm.write_bytes(
+                        int(curAbility[0],16), # Write to existing ability location, 1
+                        (int(curAbility[1]["Id"],16)+1).to_bytes(2, 'little'), # [::-1] reverses byte order, allowing me to use traditionally written item ids to write to memory
+                        2 # Bytes to write (this is silly, why wouldn't pymem just calculate that from above???)
+                        )
+                    else:
+                        print(f'{abilityTierName} is already max level')
+                except(StopIteration): # TODO: This is awful and could/should be done better. Something something don't use exceptions for application flow
+                    nextEmptySlot = next(emptyMemItr)[0]
+                    pm.write_bytes(
+                        int(nextEmptySlot,16), # Reads memory location from string
+                        min(tiered_abilities_list[abilityTierName]).to_bytes(2, 'little'), # [::-1] reverses byte order, allowing me to use traditionally written item ids to write to memory
+                        2 # Bytes to write (this is silly, why wouldn't pymem just calculate that from above???)
+                        ) 
+                    
         except(StopIteration):
             print("Couldn't write any new abilities, ability list full")
     return str(getAbilities()).replace('}, {','<br>')
