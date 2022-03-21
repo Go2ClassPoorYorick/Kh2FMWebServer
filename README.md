@@ -13,7 +13,6 @@ Api endpoints:
     - Writes an ability to the calculated end of abilities of an attached pcsx2.exe instance. This naively assumes the application is running and KH2FM is loaded and in-game
     - Using '&'s to chain ability values allows writing of more than one ability at a time:
         - http://127.0.0.1:5000/writeAbility?ability=00DF&ability=023D&ability=006D&apiKey=yyyy will write 00DF, 023D, and 006D
-    - Currently scaled abilities are not supported as I have not finished the logic for incrementing these values.
 - /clearAbilities?apiKey=yyyy
     - Clears ALL abilities from memory (writes '0000' over the ability memory)
         -The game behaves weirdly with this. You will beable to high jump until an area transition, for example
