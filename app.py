@@ -5,7 +5,7 @@ from flask import Flask, render_template, request, url_for
 from routes.abilities import abilityApi
 #Crude method to add an API key, I am uncertain how secure this may be considered. If the debug environmental variable = "true" this functionality is disabled.
 
-apiKey = ''.join(random.choice('0123456789ABCDEF') for i in range(16))
+apiKey = os.environ.get('apiKey') or ''.join(random.choice('0123456789ABCDEF') for i in range(16))
 print(apiKey)
 
 

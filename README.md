@@ -3,6 +3,11 @@ Provides an API to attatch to instances of KH2 to add/remove abilities and items
 
 As a precaution, all requests must include an API key. The API key can be found in the logs each time the program is run- at some point this may be assignable at launch, but it is currently randomly generated.
 
+Environmental variables supported:
+- debug:
+    - Disables apikey checking when set to "true"
+- apiKey
+    - Allows manual specification of an apiKey. This is also for debugging, but slightly more secure.
 
 Api endpoints:
 - /?apiKey=yyyy
@@ -12,7 +17,7 @@ Api endpoints:
 - /writeAbilities?apiKey=yyyy&ability=xxxx
     - Writes an ability to the calculated end of abilities of an attached pcsx2.exe instance. This naively assumes the application is running and KH2FM is loaded and in-game
     - Using '&'s to chain ability values allows writing of more than one ability at a time:
-        - http://127.0.0.1:5000/writeAbility?ability=00DF&ability=023D&ability=006D&apiKey=yyyy will write 00DF, 023D, and 006D
+        - /writeAbility?ability=00DF&ability=023D&ability=006D&apiKey=yyyy will add Synch Blade, Zantetsuken, and will add or level up Glide
 - /clearAbilities?apiKey=yyyy
     - Clears ALL abilities from memory (writes '0000' over the ability memory)
         -The game behaves weirdly with this. You will beable to high jump until an area transition, for example
