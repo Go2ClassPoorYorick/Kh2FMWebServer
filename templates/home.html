@@ -2,11 +2,23 @@
 <html lang="en">
 <head>
     <title>KH2 FM Web Server</title>
+    <script>
+        function pushAbilities(){
+            ids = document.getElementById("forceadd").value;
+            id_list = ids.split(',');
+            queryBuilder='?apiKey={{apiKey}}';
+            id_list.forEach(id => {
+                queryBuilder += `&ability=${id}`
+            });
+        }
+        
+    </script>
+
 </head>
 <body>
     <h1>KH2 Web API</h1>
-    <a href="/readAbilities">Attempt to view abilities of currently running KH2FM pcsx2 instance</a></br>
-    <textarea id="forceadd">This text area will be an area to list abilities (and eventually items, equipment) to add to running instance</textarea>
+    <a href="/readAbilities?apiKey={{apiKey}}">Attempt to view abilities of currently running KH2FM pcsx2 instance</a></br>
+    <textarea id="forceadd" style='width:327px; height: 50px;' oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"' >This text area will be an area to list abilities (and eventually items, equipment) to add to running instance</textarea>
     <button id="submit">Submit Items to Add</button>
 </body>
 </html>

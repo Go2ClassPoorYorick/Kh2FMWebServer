@@ -1,7 +1,7 @@
 from asyncio.windows_events import NULL
 import random
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for
 from routes.abilities import abilityApi
 #Crude method to add an API key, I am uncertain how secure this may be considered. If the debug environmental variable = "true" this functionality is disabled.
 
@@ -23,9 +23,11 @@ def before_request():
 app.register_blueprint(abilityApi)
 
 @app.route('/')
-def generate():
-    return render_template('home.html')
+def home():
+    return render_template('home.html', apiKey=request.args.get('apiKey'))
 
+with app.test_request_context():
+    print('http://localhost:5000'+url_for('home',apiKey=apiKey))
 
 if __name__ == '__main__':
     app.run(...)
