@@ -1,0 +1,9 @@
+315: #Station of Serenity
+  Id: 315
+  ItemId: 999
+  Type: Chest
+  World: 2
+  Room: 32
+  RoomChestIndex: 0
+  EventId: 0x0800 #0x083D #TT_301_END_L
+  OverallChestIndex: 241

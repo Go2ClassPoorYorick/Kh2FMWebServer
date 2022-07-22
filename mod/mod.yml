@@ -1,0 +1,28 @@
+title: MultiWorldAssets
+originalAuthor: Go2ClassPoorYorick
+description: Creates in-game text and item placeholders to represent other player's items.
+assets:
+  - name: msg/us/sys.bar
+    method: binarc
+    source:
+      - name: sys
+        type: list
+        method: kh2msg
+        source:
+          - name: msg/sys.yml
+            language: en
+  - name: 03system.bin
+    method: binarc
+    source:
+    - name: item #Implement New Pictures & Stats
+      type: list
+      method: listpatch
+      source:
+      - name: msg/ItemList.yml
+        type: item
+    - name: trsr #Add GoA Chests to Journal
+      type: list
+      method: listpatch
+      source:
+      - name: msg/TrsrList.yml
+        type: trsr
