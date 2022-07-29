@@ -1,5 +1,6 @@
 from flask import Blueprint, request
 import csv
+#TODO: pymem should re-attatch any time the window is open. 
 from helpers.pymem import pm # Open the shared pymem instance
 abilityApi = Blueprint("abilityApi", __name__)
 
@@ -85,6 +86,7 @@ def getAbilities():
 def read():
     return str(getAbilities()).replace('], [','],<br>[')
 
+# TODO: Writing an 8 for growth abilities counts as a "new" ability. We need to check for this 
 # This cluster allows us to write abilities... see readme
 @abilityApi.route('/writeAbilities', methods = ['POST','GET'])
 def writeAbilities():
